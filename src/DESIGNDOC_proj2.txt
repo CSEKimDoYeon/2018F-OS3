@@ -1,0 +1,287 @@
+			+---------------------------+
+			|		CS 330	    |
+			| PROJECT 2: USER PROGRAMS  |
+			| 	   DESIGN DOCUMENT  |
+			+---------------------------+
+
+---- GROUP ----
+
+>> Fill in the names and email addresses of your group members.
+
+Joo Yon Kim <gina611@kaist.ac.kr>
+Youn Seo Choi <dbstj72@kaist.ac.kr>
+Contribution - Joo Yon: 50%, Youn Seo: 50%
+
+---- PRELIMINARIES ----
+
+>> If you have any preliminary comments on your submission, notes for the
+>> TAs, or extra credit, please give them here.
+
+>> Please cite any offline or online sources you consulted while
+>> preparing your submission, other than the Pintos documentation, course
+>> text, lecture notes, and course staff.
+
+			   ARGUMENT PASSING
+			   ================
+
+---- DATA STRUCTURES ----
+
+>> A1: Copy here the declaration of each new or changed `struct' or
+>> `struct' member, global or static variable, `typedef', or
+>> enumeration.  Identify the purpose of each in 25 words or less.
+
+None of structure changed for argument passing.
+
+---- ALGORITHMS ----
+
+>> A2: Briefly describe how you implemented argument parsing.  How do
+>> you arrange for the elements of argv[] to be in the right order?
+>> How do you avoid overflowing the stack page?
+
+When process_execute() is called, thread_create() is called, and then start_process is called to run the new user process. In start_process, it calls load() function again, and load() calls setup_stack() function to define the *esp pointer address to PHYS_BASE. We implemented a new function, named stack_helper() to do argument parsing and passing to the stack.
+In load() function, we parse first argument, which is function name to call filesys_open(). And, we pass below file_name and save_ptr to stack_helper() function to additionally parse left arguments.
+****************************************************
+ argv_zero = strtok_r(file_name, " ", &save_ptr);
+ file = filesys_open (argv_zero);
+****************************************************
+
+In stack_helper(), we parsed the left save_ptr arguments with strtok_r(), and put each string to argv[i]. Also, we put argv[0] with file_name. Given argv stack, we stacked each argv elements in reverse order of array(LIFO). We put the given strings into the stack by using memcpy or memset. We also pushed the address of each string to the stack. We needed to decrease the stack pointer address, since stack grows downward. Code example is like below.
+***********************************************
+for (i=argc-1; i>-1; i--) {
+  *esp -= strlen(argv[i])+1;
+  memcpy(*esp, argv[i], strlen(argv[i]));
+  temp_ads[i] = *esp;
+}
+***********************************************
+
+To avoid the overflow of the stack page, rather than checking something in the stack_helper() function, we implemented syscall verifying the validity of esp address every time when defining it (when using something as parameter). So, we just changed page_fault() function slightly, not to just kill() the thread, but to do additional works and thread_exit() with exit_status(-1). exit(-1) is called when something invalid_address is given to current running thread.
+
+
+---- RATIONALE ----
+
+>> A3: Why does Pintos implement strtok_r() but not strtok()?
+
+Since strtok() uses a static buffer while argument parsing, it makes problem when multiprocessing(multi threads). Also, strtok_r()’s save_ptr is given by caller so that we can get the address of arguments safely. Our pintos needs to work with multiple threads concurrently and needs to save their address, strtok_r() is better to use.
+
+>> A4: In Pintos, the kernel separates commands into a executable name
+>> and arguments.  In Unix-like systems, the shell does this
+>> separation.  Identify at least two advantages of the Unix approach.
+
+(1) Running time in kernel will be shortened.
+(2) If memory runs out while argument parsing, only Unix user shell will die (be terminated), so that kernel can be safe.
+(3) Maybe we can write higher-level commands, for example, we can give more than 1 set of command, and parse them to run in kernel program. This means we can run multiple threads by writing multiple set of commands at once.
+
+			     SYSTEM CALLS
+			     ============
+
+---- DATA STRUCTURES ----
+
+>> B1: Copy here the declaration of each new or changed `struct' or
+>> `struct' member, global or static variable, `typedef', or
+>> enumeration.  Identify the purpose of each in 25 words or less.
+
+*****************************
+struct thread
+{
+  #ifdef USERPROG
+    struct PCB *t2pcb;
+  #endif
+};
+******************************
+Add struct PCB pointer to get thread’s related PCB easily.
+
+******************************
+struct PCB
+{
+  tid_t tid;
+  tid_t parent_tid;
+  int exit_status;
+  bool called_wait;
+  struct semaphore wait_sema;
+  struct semaphore exec_sema;
+  struct list_elem elem;
+  struct list_elem child_elem;
+  struct list child_list;
+  struct file *ownfile;
+  struct list file_list;
+  int fd;
+  bool executed;
+  struct thread *pcb2t;
+}
+********************************
+Implement new structure of PCB to store various information about the  thread. Each thread has its own PCB, and they can be easily matched by *t2pcb and *pcb2t. Actually when thread_exit() is called, we can do nothing with the thread itself, so we made PCB struct to keep and get their condition safely.
+
+*******************************
+struct filePCB
+{
+  struct file *file;
+  int fd;
+  struct list_elem file_elem;
+}
+********************************
+Implement new structure of filePCB to store them in file_list, and do various works about file.
+
+*********************************
+static struct list pcb_list;
+static struct lock pcb_tid_lock;
+**********************************
+(thread.c) When new thread-pcb is created, pcb is added to pcb_list. Also, define pcb_tid_lock to run pcb_from_tid() function more safely.
+
+*********************************
+static struct lock flock;
+*********************************
+Define flock to (open, write, tell, close..) the file safely, prevent not to be disturbed by other threads.
+
+>> B2: Describe how file descriptors are associated with open files.
+>> Are file descriptors unique within the entire OS or just within a
+>> single process?
+
+By using filesys_open function, the file opens. After that, file descriptor is allocated and saved to the file(filePCB) and thread(PCB), and f->eax. File descriptors are unique within a single process(file). (In our implementation, we start each fd from 2.) Besides, when a single file is opened more than once, whether by a single process or different processes, each open returns a new file descriptor. 
+
+---- ALGORITHMS ----
+
+>> B3: Describe your code for reading and writing user data from the
+>> kernel.
+
+To read and write, the user data calls syscall. To be specific, when looking at userprog/syscall.c, syscall_init() executes syscall_handler(). Here, we are able to check from the stack which sys_code it gives us, and we need to execute the according function with reading the arguments by adding up the stack pointer. The according functions are from filesys/file.c. The functions in file.c accesses the kernel. (By our implementation, we check whether the arguments’ address are user-provided pointers (use valid_address() function), and then dereference it.)
+When sys_code is SYS_READ or SYS_WRITE, we first do lock_acquire to run more safely. Also, we both check whether buffer has valid_address, since buffer is also pointer. 
+When reading, if file descriptor is STDIN_FILENO, we use input_getc() function, read and put each string on the buffer. In other cases, we checked several error cases, and call file_read() to read given file and put them into the buffer.
+
+When writing, if file descriptor is STDOUT_FILENO, we use putbuf() to write strings to the console. In other cases, we checked several error cases, and call file_write() to write given file into the buffer.
+lock is released when all works are done and returned.
+
+>> B4: Suppose a system call causes a full page (4,096 bytes) of data
+>> to be copied from user space into the kernel.  What is the least
+>> and the greatest possible number of inspections of the page table
+>> (e.g. calls to pagedir_get_page()) that might result?  What about
+>> for a system call that only copies 2 bytes of data?  Is there room
+>> for improvement in these numbers, and how much?
+
+<Full page(4096 bytes) of data>
+least possible number of inspections of page table is 1. If first inspection(pagedir_get_page()) get page head back, it means that all data is stored on a single page, so we don’t need to inspect any more.
+greatest possible number is 4096. If given data is not contiguous, that data is distributed in byte-sized segments. In this case, we need to check whether every address(each byte) is valid. (call pagedir_get_page() 4096 times)
+
+In out implementation, we implemented valid_address() function to use pagedir_get_page so that least possible number will be 1 and greatest number will be 8192(4096*2).
+
+<2 bytes of data>
+least possible number is 1. This is possible when pagedir_get_page have more than 2 bytes of space to the end of page.
+greatest possible number is 2. This is possible when given kernel page space is only 1 byte, or given data is not contiguous.
+
+Like above, since we use pagedir_get_page() to check validation of address, least possible number will be 1 and greatest number will be 4(2*2)
+
+>> B5: Briefly describe your implementation of the "wait" system call
+>> and how it interacts with process termination.
+
+In SYS_WAIT, we use process_wait() function. Documents said that we need to check below conditions to return -1 and exit
+pid is not alive
+pid does not refer to direct child of the calling process
+process that calls ‘wait’ has already called ‘wait’ on pid
+pid did not call exit(), but was terminated by the kernel
+To check these cases, we implemented child_list, child_elem, parent_tid and called_wait as members in PCB structure. child_list is the list of child_thread’s child_elem. parent_tid is tid of parent_thread. called_wait is to prevent (3) case. We made child_pcb->called_wait to be true when SYS_WAIT is called, and made called_wait to be false when SYS_EXIT. We checked below conditions.
+(child_pcb == NULL || child_pcb->called_wait || child_pcb->parent_tid != parent_t->tid)
+Then, we called process_wait() function and returned the function value to f->eax. For this, we implemented wait_sema in PCB structure and sema_down(&wait_sema) in process_wait(). Since wait_sema is initialized with value 0, waiting thread will be caught into process_wait() function, until other child_thread do sema_up. Child_process will sema_up(&wait_sema) when it successfully terminates the process, or also when terminated by error. When process_wait is done and returned, it means waiting is done(child_process is finished) so we (1) removed child_elem of child_pcb from parent_pcb’s child_list, and (2) removed elem of child_pcb from pcb_list, and (3) free the child_pcb, since we don’t need to use child_pcb anymore.
+
+>> B6: Any access to user program memory at a user-specified address
+>> can fail due to a bad pointer value.  Such accesses must cause the
+>> process to be terminated.  System calls are fraught with such
+>> accesses, e.g. a "write" system call requires reading the system
+>> call number from the user stack, then each of the call's three
+>> arguments, then an arbitrary amount of user memory, and any of
+>> these can fail at any point.  This poses a design and
+>> error-handling problem: how do you best avoid obscuring the primary
+>> function of code in a morass of error-handling?  Furthermore, when
+>> an error is detected, how do you ensure that all temporarily
+>> allocated resources (locks, buffers, etc.) are freed?  In a few
+>> paragraphs, describe the strategy or strategies you adopted for
+>> managing these issues.  Give an example.
+
+We implemented function valid_address() and check whether (address is null) or (address is not in user_virtual_address) or (pagedir’s physical address is valid, using pagedir_get_page()). We got each arguments (*f->esp) by the function get_val(). This function checks whether (f->esp) address is valid or not by calling valid_address() function. This means that whenever we get new arguments, we check whether argument’s address is valid or not. (Here, valid means it is not null and in the user address bound.) Furthermore, we checked whether argument has valid_address if given argument is pointer - for example, in “write” system call buffer is pointer, and need to check the validation. If above arguments have invalid address, we called invalid_terminate() function which does similar work with terminate(), calling thread_exit to free the resources.(Only the  difference between invalid_terminate and terminate is that invalid_terminate changes exit_status to -1.)
+
+When error is detected, even when we cannot catch the error from valid_address() function, we can ensure that all temporarily allocated resources are freed, since we revised the page_fault() function, not to just kill() the process, but to run thread_exit() function. Since we implement thread_exit() to free all remaining resources, we can ensure memory problem don’t happen.
+
+---- SYNCHRONIZATION ----
+
+>> B7: The "exec" system call returns -1 if loading the new executable
+>> fails, so it cannot return before the new executable has completed
+>> loading.  How does your code ensure this?  How is the load
+>> success/failure status passed back to the thread that calls "exec"?
+
+We implemented exec_sema in PCB structure. Pintos document says that the parent process cannot return from exec until it knows whether the child process successfully loaded its execuatable. Therefore, we use semaphore ‘exec_sema’ to make parent process wait its’ child processes.
+Since we need exec_sema from child_process’s pcb, we first need to call process_execute() to get the child_process’s tid (We can find child_process’s pcb from given tid). process_execute just allocates a new child_process to memory, and returns the tid, means that it doesn’t run start_process() yet. Before start_process() starts, parent_process sema_down(&child_pcb->exec_sema) so that parent_process will wait until child_process loading is done. Child_process will do sema_up at the end of the load() function, which means that child_process’s execution is done. From this, we are sure that the parent_process cannot return before the new executable child process has completed loading.
+
+Furthermore, we need to know whether the new executable process is failed or not. To check this, we implemented an executed boolean that is false when load is failed. We made the default value of executed as false, and changed it true when loading the file succeeds. Therefore, we can check whether load is success or not by checking (child_pcb->executed), and return -1 if load is failed.
+
+
+>> B8: Consider parent process P with child process C.  How do you
+>> ensure proper synchronization and avoid race conditions when P
+>> calls wait(C) before C exits?  After C exits?  How do you ensure
+>> that all resources are freed in each case?  How about when P
+>> terminates without waiting, before C exits?  After C exits?  Are
+>> there any special cases?
+
+There are four circumstances as below.
+(1) P calls wait(C) before C exits
+When P waits for C, from SYS_WAIT P will sema_down the C’s wait_sema, so that parent process will wait until child process is done(exit). When child process terminates, it sema_up it’s wait_sema so that parent process can progress its own code.
+
+(2) P calls wait(C) after C exits
+When P calls wait(C) after C exits, C will sema_up its wait_sema when exiting (terminate) so the value of wait_sema will be 1. (0 + 1 = 1 )
+Therefore, if P calls wait(C) and tries to wait process C by doing sema_down(&C_pcb->wait_sema), because value is not zero, P will not wait for already exited process, and just execute its progress.
+
+(3) P terminates without waiting, before C exits
+Free all child_pcb in parent’s child_list.
+Actually we tried to also free all Child_processes, but we concluded that we do not need to implement additionally for this, because - exiting the child processes when parent process is terminated - is done by the kernel already. Children will all be exited and freed when their parent terminates.
+
+(4) P terminates without waiting, after C exits
+Same process with (3) case, with freeing all resources of parent process. (Nothing happens…)
+
+---- RATIONALE ----
+
+>> B9: Why did you choose to implement access to user memory from the
+>> kernel in the way that you did?
+
+c.f.)The behaviors defined in the syscall are for the kernel area, it changes the status of the OS itself, so the kernel should provide exclusive access to these functions (the user memory cannot reference it directly).
+So for the user memory to access the kernel, we followed the first and simpler approach between the two methods mentioned in the pintos document. We checked for the all cases of buffer validation first and then dereferenced it.
+We chose this method because it is straight forward when releasing the lock or freeing the page of memory. This will prevent us from leaking resources. Also, there are no cases of invalid pointers creating page faults afterwards.
+
+>> B10: What advantages or disadvantages can you see to your design
+>> for file descriptors?
+
+Our design for file descriptors is as below:
+To manage file descriptors, we put in fd as a member both in file(filePCB) and thread(PCB). The fd in PCB is for the uniqueness of file descriptors in each thread(=process in pintos). The fd in filePCB is the file descriptors for each file.
+
+We start fd from 2 for each process, because File descriptor 0 and 1 are reserved for STDIN and STDOUT. From 2, we increment it by 1 at a time.
+
+Our method’s advantage is that process : thread : PCB : file_list is allocated 1:1:1:1. So file_list is allocated uniquely for each process. This is safe since it secures the fact - ‘each process has an independent set of file descriptors.’
+
+Our method’s disadvantage is that since an integer has a fixed size, there is a fixed maximum value it can store. If the process was big and large enough that many files were opened and needed to store a value greater than this maximum value, then integer overflow can occur.
+
+
+>> B11: The default tid_t to pid_t mapping is the identity mapping.
+>> If you changed it, what advantages are there to your approach?
+
+In pintos, only one thread is for one process so it is 1:1 matching. We did not change the original method.
+
+			   SURVEY QUESTIONS
+			   ================
+
+Answering these questions is optional, but it will help us improve the
+course in future quarters.  Feel free to tell us anything you
+want--these questions are just to spur your thoughts.  You may also
+choose to respond anonymously in the course evaluations at the end of
+the quarter.
+
+>> In your opinion, was this assignment, or any one of the three problems
+>> in it, too easy or too hard?  Did it take too long or too little time?
+
+>> Did you find that working on a particular part of the assignment gave
+>> you greater insight into some aspect of OS design?
+
+>> Is there some particular fact or hint we should give students in
+>> future quarters to help them solve the problems?  Conversely, did you
+>> find any of our guidance to be misleading?
+
+>> Do you have any suggestions for the TAs to more effectively assist
+>> students, either for future quarters or the remaining projects?
+
+>> Any other comments?
+

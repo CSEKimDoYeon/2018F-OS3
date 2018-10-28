@@ -1,0 +1,24 @@
+{
+    "remotePath": "/home/20160156/pintos",
+    "host": "143.248.140.158",
+    "username": "20160156",
+    "password": "tnfqkrtm",
+    "port": 8822,
+    "secure": false,
+    "protocol": "sftp",
+    "uploadOnSave": true,
+    "passive": false,
+    "debug": false,
+    "privateKeyPath": null,
+    "passphrase": null,
+    "ignore": [
+        "\\.vscode",
+        "\\.git",
+        "\\.DS_Store"
+    ],
+    "generatedFiles": {
+        "uploadOnSave": false,
+        "extensionsToInclude": [],
+        "path": ""
+    }
+}

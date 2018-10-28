@@ -1,0 +1,29 @@
+Copying tests/vm/pt-bad-addr into /tmp/9BOQ5Saode.dsk...
+Writing command line to /tmp/cuqU3k1W4H.dsk...
+qemu -hda /tmp/cuqU3k1W4H.dsk -hdb /tmp/zUfkj47IbK.dsk -hdc /tmp/9BOQ5Saode.dsk -hdd /tmp/uFUxNa8BYs.dsk -m 4 -net none -nographic -monitor null
+Kernel command line: -q -f put pt-bad-addr run pt-bad-addr
+Pintos booting with 4,088 kB RAM...
+373 pages available in kernel pool.
+373 pages available in user pool.
+Calibrating timer...  65,433,600 loops/s.
+hd0:0: detected 137 sector (68 kB) disk, model "QEMU HARDDISK", serial "QM00001"
+hd0:1: detected 4,032 sector (1 MB) disk, model "QEMU HARDDISK", serial "QM00002"
+hd1:0: detected 104 sector (52 kB) disk, model "QEMU HARDDISK", serial "QM00003"
+hd1:1: detected 8,064 sector (3 MB) disk, model "QEMU HARDDISK", serial "QM00004"
+Formatting file system...done.
+Boot complete.
+Putting 'pt-bad-addr' into the file system...
+Executing 'pt-bad-addr':
+(pt-bad-addr) begin
+pt-bad-addr: exit(-1)
+Execution of 'pt-bad-addr' complete.
+Timer: 61 ticks
+Thread: 1 idle ticks, 59 kernel ticks, 1 user ticks
+hd0:0: 0 reads, 0 writes
+hd0:1: 59 reads, 216 writes
+hd1:0: 104 reads, 0 writes
+hd1:1: 0 reads, 0 writes
+Console: 902 characters output
+Keyboard: 0 keys pressed
+Exception: 1 page faults
+Powering off...

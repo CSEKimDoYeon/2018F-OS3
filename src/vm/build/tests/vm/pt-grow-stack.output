@@ -1,0 +1,29 @@
+Copying tests/vm/pt-grow-stack into /tmp/0qtR4rvwO0.dsk...
+Writing command line to /tmp/Y_G3iAfnVp.dsk...
+qemu -hda /tmp/Y_G3iAfnVp.dsk -hdb /tmp/rXLp8zv3QR.dsk -hdc /tmp/0qtR4rvwO0.dsk -hdd /tmp/FebeiHCdNF.dsk -m 4 -net none -nographic -monitor null
+Kernel command line: -q -f put pt-grow-stack run pt-grow-stack
+Pintos booting with 4,088 kB RAM...
+373 pages available in kernel pool.
+373 pages available in user pool.
+Calibrating timer...  124,928,000 loops/s.
+hd0:0: detected 137 sector (68 kB) disk, model "QEMU HARDDISK", serial "QM00001"
+hd0:1: detected 4,032 sector (1 MB) disk, model "QEMU HARDDISK", serial "QM00002"
+hd1:0: detected 113 sector (56 kB) disk, model "QEMU HARDDISK", serial "QM00003"
+hd1:1: detected 8,064 sector (3 MB) disk, model "QEMU HARDDISK", serial "QM00004"
+Formatting file system...done.
+Boot complete.
+Putting 'pt-grow-stack' into the file system...
+Executing 'pt-grow-stack':
+(pt-grow-stack) begin
+pt-grow-stack: exit(-1)
+Execution of 'pt-grow-stack' complete.
+Timer: 65 ticks
+Thread: 0 idle ticks, 64 kernel ticks, 1 user ticks
+hd0:0: 0 reads, 0 writes
+hd0:1: 62 reads, 234 writes
+hd1:0: 113 reads, 0 writes
+hd1:1: 0 reads, 0 writes
+Console: 917 characters output
+Keyboard: 0 keys pressed
+Exception: 1 page faults
+Powering off...

@@ -1,0 +1,33 @@
+Copying tests/vm/mmap-clean into /tmp/Nn0DeiwKFY.dsk...
+Copying ../../tests/vm/sample.txt into /tmp/Nn0DeiwKFY.dsk...
+Writing command line to /tmp/R9ZJIezYTE.dsk...
+qemu -hda /tmp/R9ZJIezYTE.dsk -hdb /tmp/C7CQYWtuHs.dsk -hdc /tmp/Nn0DeiwKFY.dsk -hdd /tmp/N9rxBFTVvM.dsk -m 4 -net none -nographic -monitor null
+Kernel command line: -q -f put mmap-clean put sample.txt run mmap-clean
+Pintos booting with 4,088 kB RAM...
+373 pages available in kernel pool.
+373 pages available in user pool.
+Calibrating timer...  104,755,200 loops/s.
+hd0:0: detected 137 sector (68 kB) disk, model "QEMU HARDDISK", serial "QM00001"
+hd0:1: detected 4,032 sector (1 MB) disk, model "QEMU HARDDISK", serial "QM00002"
+hd1:0: detected 111 sector (55 kB) disk, model "QEMU HARDDISK", serial "QM00003"
+hd1:1: detected 8,064 sector (3 MB) disk, model "QEMU HARDDISK", serial "QM00004"
+Formatting file system...done.
+Boot complete.
+Putting 'mmap-clean' into the file system...
+Putting 'sample.txt' into the file system...
+Executing 'mmap-clean':
+(mmap-clean) begin
+(mmap-clean) open "sample.txt"
+(mmap-clean) mmap "sample.txt"
+mmap-clean: exit(-1)
+Execution of 'mmap-clean' complete.
+Timer: 59 ticks
+Thread: 0 idle ticks, 59 kernel ticks, 1 user ticks
+hd0:0: 0 reads, 0 writes
+hd0:1: 100 reads, 232 writes
+hd1:0: 111 reads, 0 writes
+hd1:1: 0 reads, 0 writes
+Console: 1019 characters output
+Keyboard: 0 keys pressed
+Exception: 0 page faults
+Powering off...

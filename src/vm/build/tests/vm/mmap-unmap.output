@@ -1,0 +1,33 @@
+Copying tests/vm/mmap-unmap into /tmp/Yf4MsPbHs5.dsk...
+Copying ../../tests/vm/sample.txt into /tmp/Yf4MsPbHs5.dsk...
+Writing command line to /tmp/E8Uxm4yVo3.dsk...
+qemu -hda /tmp/E8Uxm4yVo3.dsk -hdb /tmp/4h1PjLRXrh.dsk -hdc /tmp/Yf4MsPbHs5.dsk -hdd /tmp/vFaLqoNGob.dsk -m 4 -net none -nographic -monitor null
+Kernel command line: -q -f put mmap-unmap put sample.txt run mmap-unmap
+Pintos booting with 4,088 kB RAM...
+373 pages available in kernel pool.
+373 pages available in user pool.
+Calibrating timer...  405,913,600 loops/s.
+hd0:0: detected 137 sector (68 kB) disk, model "QEMU HARDDISK", serial "QM00001"
+hd0:1: detected 4,032 sector (1 MB) disk, model "QEMU HARDDISK", serial "QM00002"
+hd1:0: detected 109 sector (54 kB) disk, model "QEMU HARDDISK", serial "QM00003"
+hd1:1: detected 8,064 sector (3 MB) disk, model "QEMU HARDDISK", serial "QM00004"
+Formatting file system...done.
+Boot complete.
+Putting 'mmap-unmap' into the file system...
+Putting 'sample.txt' into the file system...
+Executing 'mmap-unmap':
+(mmap-unmap) begin
+(mmap-unmap) open "sample.txt"
+(mmap-unmap) mmap "sample.txt"
+mmap-unmap: exit(-1)
+Execution of 'mmap-unmap' complete.
+Timer: 60 ticks
+Thread: 3 idle ticks, 56 kernel ticks, 1 user ticks
+hd0:0: 0 reads, 0 writes
+hd0:1: 98 reads, 228 writes
+hd1:0: 109 reads, 0 writes
+hd1:1: 0 reads, 0 writes
+Console: 1018 characters output
+Keyboard: 0 keys pressed
+Exception: 0 page faults
+Powering off...

@@ -1,0 +1,25 @@
+Copying tests/vm/page-parallel into /tmp/WqL7MAq4dr.dsk...
+Copying tests/vm/child-linear into /tmp/WqL7MAq4dr.dsk...
+Writing command line to /tmp/Zi47PXUThs.dsk...
+qemu -hda /tmp/Zi47PXUThs.dsk -hdb /tmp/7CLmclts3_.dsk -hdc /tmp/WqL7MAq4dr.dsk -hdd /tmp/2T8Cqn5yvZ.dsk -m 4 -net none -nographic -monitor null
+Kernel command line: -q -f put page-parallel put child-linear run page-parallel
+Pintos booting with 4,088 kB RAM...
+373 pages available in kernel pool.
+373 pages available in user pool.
+Calibrating timer...  313,753,600 loops/s.
+hd0:0: detected 137 sector (68 kB) disk, model "QEMU HARDDISK", serial "QM00001"
+hd0:1: detected 4,032 sector (1 MB) disk, model "QEMU HARDDISK", serial "QM00002"
+hd1:0: detected 212 sector (106 kB) disk, model "QEMU HARDDISK", serial "QM00003"
+hd1:1: detected 8,064 sector (3 MB) disk, model "QEMU HARDDISK", serial "QM00004"
+Formatting file system...done.
+Boot complete.
+Putting 'page-parallel' into the file system...
+Putting 'child-linear' into the file system...
+Executing 'page-parallel':
+(page-parallel) begin
+(page-parallel) exec "child-linear"
+(page-parallel) exec "child-linear"
+Kernel PANIC at ../../vm/frame.c:29 in frame_entry_allocate(): kernel panic made by us
+Call stack: 0xc0129ea0child-linear: exit(-1)
+child-linear: exit(66)
+Simulation terminated due to kernel panic.

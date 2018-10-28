@@ -1,0 +1,29 @@
+Copying tests/vm/pt-big-stk-obj into /tmp/G8l8KKcalS.dsk...
+Writing command line to /tmp/JSDCpuE6io.dsk...
+qemu -hda /tmp/JSDCpuE6io.dsk -hdb /tmp/DoIQf0g7VD.dsk -hdc /tmp/G8l8KKcalS.dsk -hdd /tmp/vhxpsNxI7W.dsk -m 4 -net none -nographic -monitor null
+Kernel command line: -q -f put pt-big-stk-obj run pt-big-stk-obj
+Pintos booting with 4,088 kB RAM...
+373 pages available in kernel pool.
+373 pages available in user pool.
+Calibrating timer...  165,273,600 loops/s.
+hd0:0: detected 137 sector (68 kB) disk, model "QEMU HARDDISK", serial "QM00001"
+hd0:1: detected 4,032 sector (1 MB) disk, model "QEMU HARDDISK", serial "QM00002"
+hd1:0: detected 113 sector (56 kB) disk, model "QEMU HARDDISK", serial "QM00003"
+hd1:1: detected 8,064 sector (3 MB) disk, model "QEMU HARDDISK", serial "QM00004"
+Formatting file system...done.
+Boot complete.
+Putting 'pt-big-stk-obj' into the file system...
+Executing 'pt-big-stk-obj':
+(pt-big-stk-obj) begin
+pt-big-stk-obj: exit(-1)
+Execution of 'pt-big-stk-obj' complete.
+Timer: 63 ticks
+Thread: 0 idle ticks, 62 kernel ticks, 1 user ticks
+hd0:0: 0 reads, 0 writes
+hd0:1: 62 reads, 234 writes
+hd1:0: 113 reads, 0 writes
+hd1:1: 0 reads, 0 writes
+Console: 924 characters output
+Keyboard: 0 keys pressed
+Exception: 1 page faults
+Powering off...

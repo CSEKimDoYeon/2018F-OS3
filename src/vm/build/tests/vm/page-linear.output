@@ -1,0 +1,29 @@
+Copying tests/vm/page-linear into /tmp/GSg_A3TmKx.dsk...
+Writing command line to /tmp/sAl2syD0Lg.dsk...
+qemu -hda /tmp/sAl2syD0Lg.dsk -hdb /tmp/I6Vyw22EMQ.dsk -hdc /tmp/GSg_A3TmKx.dsk -hdd /tmp/dIzpOs7h84.dsk -m 4 -net none -nographic -monitor null
+Kernel command line: -q -f put page-linear run page-linear
+Pintos booting with 4,088 kB RAM...
+373 pages available in kernel pool.
+373 pages available in user pool.
+Calibrating timer...  97,996,800 loops/s.
+hd0:0: detected 137 sector (68 kB) disk, model "QEMU HARDDISK", serial "QM00001"
+hd0:1: detected 4,032 sector (1 MB) disk, model "QEMU HARDDISK", serial "QM00002"
+hd1:0: detected 110 sector (55 kB) disk, model "QEMU HARDDISK", serial "QM00003"
+hd1:1: detected 8,064 sector (3 MB) disk, model "QEMU HARDDISK", serial "QM00004"
+Formatting file system...done.
+Boot complete.
+Putting 'page-linear' into the file system...
+Executing 'page-linear':
+Kernel PANIC at ../../vm/frame.c:29 in frame_entry_allocate(): kernel panic made by us
+Call stack: 0xc011dea0page-linear: exit(-1)
+Execution of 'page-linear' complete.
+Timer: 64 ticks
+Thread: 0 idle ticks, 61 kernel ticks, 3 user ticks
+hd0:0: 0 reads, 0 writes
+hd0:1: 59 reads, 228 writes
+hd1:0: 110 reads, 0 writes
+hd1:1: 0 reads, 0 writes
+Console: 991 characters output
+Keyboard: 0 keys pressed
+Exception: 1 page faults
+Powering off...

@@ -1,0 +1,2 @@
+Prototype mismatch: sub main::SIGVTALRM () vs none at /home/20160156/pintos/src/utils/pintos line 874.
+Constant subroutine SIGVTALRM redefined at /home/20160156/pintos/src/utils/pintos line 866.

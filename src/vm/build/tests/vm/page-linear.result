@@ -1,0 +1,5 @@
+FAIL
+Kernel panic in run: PANIC at ../../vm/frame.c:29 in frame_entry_allocate(): kernel panic made by us
+Call stack: 0xc011dea0
+Translation of call stack:
+0xc011dea0: (unknown)

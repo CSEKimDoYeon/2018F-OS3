@@ -1,0 +1,31 @@
+Copying tests/vm/page-merge-par into /tmp/BHjMB7QILT.dsk...
+Copying tests/vm/child-sort into /tmp/BHjMB7QILT.dsk...
+Writing command line to /tmp/9HGybNqZkK.dsk...
+qemu -hda /tmp/9HGybNqZkK.dsk -hdb /tmp/vnDM69LxNN.dsk -hdc /tmp/BHjMB7QILT.dsk -hdd /tmp/Eh0VnEIf19.dsk -m 4 -net none -nographic -monitor null
+Kernel command line: -q -f put page-merge-par put child-sort run page-merge-par
+Pintos booting with 4,088 kB RAM...
+373 pages available in kernel pool.
+373 pages available in user pool.
+Calibrating timer...  104,755,200 loops/s.
+hd0:0: detected 137 sector (68 kB) disk, model "QEMU HARDDISK", serial "QM00001"
+hd0:1: detected 4,032 sector (1 MB) disk, model "QEMU HARDDISK", serial "QM00002"
+hd1:0: detected 220 sector (110 kB) disk, model "QEMU HARDDISK", serial "QM00003"
+hd1:1: detected 8,064 sector (3 MB) disk, model "QEMU HARDDISK", serial "QM00004"
+Formatting file system...done.
+Boot complete.
+Putting 'page-merge-par' into the file system...
+Putting 'child-sort' into the file system...
+Executing 'page-merge-par':
+Kernel PANIC at ../../vm/frame.c:29 in frame_entry_allocate(): kernel panic made by us
+Call stack: 0xc011dea0page-merge-par: exit(-1)
+Execution of 'page-merge-par' complete.
+Timer: 58 ticks
+Thread: 0 idle ticks, 56 kernel ticks, 2 user ticks
+hd0:0: 0 reads, 0 writes
+hd0:1: 87 reads, 450 writes
+hd1:0: 220 reads, 0 writes
+hd1:1: 0 reads, 0 writes
+Console: 1071 characters output
+Keyboard: 0 keys pressed
+Exception: 1 page faults
+Powering off...
